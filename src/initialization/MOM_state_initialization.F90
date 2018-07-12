@@ -55,6 +55,9 @@ use baroclinic_zone_initialization, only : baroclinic_zone_init_temperature_sali
 use benchmark_initialization, only : benchmark_initialize_thickness
 use benchmark_initialization, only : benchmark_init_temperature_salinity
 use Neverland_initialization, only : Neverland_initialize_thickness
+use shoebox2_initialization, only : shoebox2_initialize_thickness
+use channel6_initialization, only : channel6_initialize_sponges
+use channel6_initialization, only : channel6_initialize_thickness
 use circle_obcs_initialization, only : circle_obcs_initialize_thickness
 use lock_exchange_initialization, only : lock_exchange_initialize_thickness
 use external_gwave_initialization, only : external_gwave_initialize_thickness
@@ -253,6 +256,8 @@ subroutine MOM_initialize_state(u, v, h, tv, Time, G, GV, PF, dirs, &
              " \t\t ISOMIP test case. \n"//&
              " \t benchmark - use the benchmark test case thicknesses. \n"//&
              " \t Neverland - use the Neverland test case thicknesses. \n"//&
+             " \t shoebox2 - use the shoebox2 test case thicknesses. \n"//&
+             " \t channel6 - use the channel6 test case thicknesses. \n"//&
              " \t search - search a density profile for the interface \n"//&
              " \t\t densities. This is not yet implemented. \n"//&
              " \t circle_obcs - the circle_obcs test case is used. \n"//&
@@ -288,6 +293,10 @@ subroutine MOM_initialize_state(u, v, h, tv, Time, G, GV, PF, dirs, &
        case ("benchmark"); call benchmark_initialize_thickness(h, G, GV, PF, &
                                     tv%eqn_of_state, tv%P_Ref, just_read_params=just_read)
        case ("Neverland"); call Neverland_initialize_thickness(h, G, GV, PF, &
+                                 tv%eqn_of_state, tv%P_Ref)
+       case ("shoebox2"); call shoebox2_initialize_thickness(h, G, GV, PF, &
+                                 tv%eqn_of_state, tv%P_Ref)
+       case ("channel6"); call channel6_initialize_thickness(h, G, GV, PF, &
                                  tv%eqn_of_state, tv%P_Ref)
        case ("search"); call initialize_thickness_search
        case ("circle_obcs"); call circle_obcs_initialize_thickness(h, G, GV, PF, &
@@ -516,6 +525,7 @@ subroutine MOM_initialize_state(u, v, h, tv, Time, G, GV, PF, dirs, &
                  " \t DOME - use a slope and channel configuration for the \n"//&
                  " \t\t DOME sill-overflow test case. \n"//&
                  " \t BFB - Sponge at the southern boundary of the domain\n"//&
+                 " \t channel6 - Sponge at the northern boundary of the domain\n"//&
                  " \t\t for buoyancy-forced basin case.\n"//&
                  " \t USER - call a user modified routine.", default="file")
     select case (trim(config))
@@ -528,6 +538,8 @@ subroutine MOM_initialize_state(u, v, h, tv, Time, G, GV, PF, dirs, &
                                                PF, sponge_CSp, h)
       case ("BFB"); call BFB_initialize_sponges_southonly(G, use_temperature, tv, &
                                                PF, sponge_CSp, h)
+      case ("channel6"); call channel6_initialize_sponges(G, GV, use_temperature, &
+                                                tv, PF, sponge_CSp, h)
       case ("DUMBBELL"); call dumbbell_initialize_sponges(G, GV, tv, &
                                                PF, useALE, sponge_CSp, ALE_sponge_CSp)
       case ("phillips"); call Phillips_initialize_sponges(G, use_temperature, tv, &
