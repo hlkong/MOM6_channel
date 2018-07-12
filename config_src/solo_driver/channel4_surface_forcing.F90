@@ -67,7 +67,7 @@ subroutine channel4_wind_forcing(sfc_state, forces, day, G, CS)
   real :: x, y
   real :: PI = 4.0*atan(1.0), wp_SO, wp2, latext, lonext
 
-  wp_SO = 0.1 ! westerly peak in SO;  53 S
+  wp_SO = 0.3 ! westerly peak in SO;  53 S
   wp2 = -0.07871  ! easterly peak in Southern subtropics; 11.75S
   forces%taux = 0.0
   latext = G%len_lat

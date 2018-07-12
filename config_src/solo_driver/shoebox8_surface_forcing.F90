@@ -138,7 +138,7 @@ subroutine shoebox8_wind_forcing(sfc_state, forces, day, G, CS)
   real :: PI = 4.0*atan(1.0), wp_SO, wp2, wp3, wp4, wp5, wp6, latext, lonext
 
   ! wp_SO = 0.13961 ! westerly peak in SO;  53 S
-  wp_SO = 0.2   ! new southern ocean wind stress peak; new for shoebox8
+  wp_SO = 0.3   ! new southern ocean wind stress peak; new for shoebox8
   wp2 = -0.07871  ! easterly peak in Southern subtropics; 11.75S
   wp3 = 0.03060  ! easterly trough near the equator; 4.75N
   wp4 = -0.07131  ! esterly peak in Northern subtropics;  18.25N
