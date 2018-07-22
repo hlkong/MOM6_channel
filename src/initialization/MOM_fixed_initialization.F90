@@ -33,6 +33,8 @@ use benchmark_initialization, only : benchmark_initialize_topography
 use Neverland_initialization, only : Neverland_initialize_topography
 use shoebox2_initialization, only : shoebox2_initialize_topography
 use channel6_initialization, only : channel6_initialize_topography
+use channel7_initialization, only : channel7_initialize_topography
+use channel8_initialization, only : channel8_initialize_topography
 use DOME2d_initialization, only : DOME2d_initialize_topography
 use Kelvin_initialization, only : Kelvin_initialize_topography
 use sloshing_initialization, only : sloshing_initialize_topography
@@ -197,6 +199,8 @@ subroutine MOM_initialize_topography(D, max_depth, G, PF)
                  " \t Neverland - use the Neverland test case topography. \n"//&
                  " \t shoebox2 - use the shoebox2 test case topography. \n"//&
                  " \t channel6 - use the channel6 test case topography. \n"//&
+                 " \t channel7 - use the channel7 test case topography. \n"//&
+                 " \t channel8 - use the channel8 test case topography. \n"//&
                  " \t DOME - use a slope and channel configuration for the \n"//&
                  " \t\t DOME sill-overflow test case. \n"//&
                  " \t ISOMIP - use a slope and channel configuration for the \n"//&
@@ -224,6 +228,8 @@ subroutine MOM_initialize_topography(D, max_depth, G, PF)
     case ("Neverland"); call Neverland_initialize_topography(D, G, PF, max_depth)
     case ("shoebox2");  call shoebox2_initialize_topography(D, G, PF, max_depth)
     case ("channel6");  call channel6_initialize_topography(D, G, PF, max_depth)
+    case ("channel7");  call channel7_initialize_topography(D, G, PF, max_depth)
+    case ("channel8");  call channel8_initialize_topography(D, G, PF, max_depth)
     case ("DOME2D");    call DOME2d_initialize_topography(D, G, PF, max_depth)
     case ("Kelvin");    call Kelvin_initialize_topography(D, G, PF, max_depth)
     case ("sloshing");  call sloshing_initialize_topography(D, G, PF, max_depth)
