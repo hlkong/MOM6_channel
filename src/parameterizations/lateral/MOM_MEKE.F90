@@ -64,6 +64,7 @@ type, public :: MEKE_CS ; private
   real :: aEady         !< Weighting towards Eady scale of mixing length (non-dim.)
   real :: aGrid         !< Weighting towards grid scale of mixing length (non-dim.)
   real :: MEKE_advection_factor !< A scaling in front of the advection of MEKE (non-dim.)
+  real :: MEKE_topographic_beta 
   logical :: initialize !< If True, invokes a steady state solver to calculate MEKE.
   logical :: debug      !< If true, write out checksums of data for debugging
 
@@ -621,8 +622,10 @@ subroutine MEKE_equilibrium(CS, MEKE, G, GV, SN_u, SN_v, drag_rate_visc, I_mass)
     !beta = sqrt((D(i,j)*G%dF_dx(i,j)-FatH*(D(i+1,j)-D(i-1,j))/2./G%dxT(i,j)/tbf)**2. &
     ! (D(i,j)*G%dF_dy(i,j)-FatH*(D(i,j+1)-D(i,j-1))/2./G%dyT(i,j)/tbf)**2.)
     ! new-new beta    
-    beta = sqrt((G%dF_dx(i,j)-FatH/D(i,j)*(D(i+1,j)-D(i-1,j))/2./G%dxT(i,j)/tbf)**2. &
-              +(G%dF_dy(i,j)-FatH/D(i,j)*(D(i,j+1)-D(i,j-1))/2./G%dyT(i,j)/tbf)**2.)
+    beta = sqrt((G%dF_dx(i,j)-CS%MEKE_topographic_beta*FatH/D(i,j)&
+              *(D(i+1,j)-D(i-1,j))/2./G%dxT(i,j)/tbf)**2. &
+              +(G%dF_dy(i,j)-CS%MEKE_topographic_beta*FatH/D(i,j)&
+              *(D(i,j+1)-D(i,j-1))/2./G%dyT(i,j)/tbf)**2.)
 
 
     I_H = GV%Rho0 * I_mass(i,j)
@@ -754,8 +757,10 @@ subroutine MEKE_lengthScales(CS, MEKE, G, SN_u, SN_v, &
       ! beta = sqrt((D(i,j)*G%dF_dx(i,j)-FatH*(D(i+1,j)-D(i-1,j))/2./G%dxT(i,j)/tbf)**2. &
       ! (D(i,j)*G%dF_dy(i,j)-FatH*(D(i,j+1)-D(i,j-1))/2./G%dyT(i,j)/tbf)**2.)
 
-      beta = sqrt((G%dF_dx(i,j)-FatH/D(i,j)*(D(i+1,j)-D(i-1,j))/2./G%dxT(i,j)/tbf)**2. &
-                   +(G%dF_dy(i,j)-FatH/D(i,j)*(D(i,j+1)-D(i,j-1))/2./G%dyT(i,j)/tbf)**2.)
+      beta = sqrt((G%dF_dx(i,j)-CS%MEKE_topographic_beta*FatH/D(i,j)&
+                *(D(i+1,j)-D(i-1,j))/2./G%dxT(i,j)/tbf)**2. &
+                +(G%dF_dy(i,j)-CS%MEKE_topographic_beta*FatH/D(i,j)&
+                *(D(i,j+1)-D(i,j-1))/2./G%dyT(i,j)/tbf)**2.)
 
 
     endif
@@ -989,6 +994,11 @@ logical function MEKE_init(Time, G, param_file, diag, CS, MEKE, restart_CS)
                  "A scale factor in front of advection of eddy energy. Zero turns advection off.\n"//&
                  "Using unity would be normal but other values could accomodate a mismatch\n"//&
                  "between the advecting barotropic flow and the vertical structure of MEKE.", &
+                 units="nondim", default=0.0)
+  call get_param(param_file, mdl, "MEKE_TOPOGRAPHIC_BETA", CS%MEKE_topographic_beta, &
+                 "A scale factor to determine how much topographic beta is weighed in " //&
+                 "computing beta in the expression of Rhines scale. Use 1 if full "//&
+                 "topographic beta effect is considered; use 0 if it's completely ignored.", &
                  units="nondim", default=0.0)
 
   ! Nonlocal module parameters

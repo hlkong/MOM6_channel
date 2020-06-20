@@ -58,6 +58,8 @@ use Neverland_initialization, only : Neverland_initialize_thickness
 use shoebox2_initialization, only : shoebox2_initialize_thickness
 use channel6_initialization, only : channel6_initialize_sponges
 use channel6_initialization, only : channel6_initialize_thickness
+use channel5_initialization, only : channel5_initialize_sponges
+use channel4_initialization, only : channel4_initialize_sponges
 use circle_obcs_initialization, only : circle_obcs_initialize_thickness
 use lock_exchange_initialization, only : lock_exchange_initialize_thickness
 use external_gwave_initialization, only : external_gwave_initialize_thickness
@@ -525,8 +527,17 @@ subroutine MOM_initialize_state(u, v, h, tv, Time, G, GV, PF, dirs, &
                  " \t DOME - use a slope and channel configuration for the \n"//&
                  " \t\t DOME sill-overflow test case. \n"//&
                  " \t BFB - Sponge at the southern boundary of the domain\n"//&
-                 " \t channel6 - Sponge at the northern boundary of the domain\n"//&
-                 " \t\t for buoyancy-forced basin case.\n"//&
+                 " \t channel6 - Sponge at the northern boundary of the domain: \n"//&
+                 " \t\t determined by old shoebox simulation with k_GM=700, \n" //&
+                 " \t\t symmetric buoyancy and asymmetric wind across the equator. \n" //&
+                 " \t\t No artificially deepened mixed layer. \n" //&
+                 " \t channel5 - similar to channel6 but the stratification is \n " //&
+                 " \t\t determined by a new shoebox simulation with no topography \n" //&
+                 " \t\t in the Southern Ocean and with Visbeck parameterization. \n" //& 
+                 " \t channel4 - similar to channel6 but the stratification is \n " //&
+                 " \t\t determined by a new shoebox simulation with TMEKE parameterization, \n" //&                  
+                 " \t\t asymmetric buoyancy and symmetric wind across the equator. \n " //&
+                 " \t\t It also uses an artificially deepened surface mixed layer. \n " //&
                  " \t USER - call a user modified routine.", default="file")
     select case (trim(config))
       case ("DOME"); call DOME_initialize_sponges(G, GV, tv, PF, sponge_CSp)
@@ -539,6 +550,10 @@ subroutine MOM_initialize_state(u, v, h, tv, Time, G, GV, PF, dirs, &
       case ("BFB"); call BFB_initialize_sponges_southonly(G, use_temperature, tv, &
                                                PF, sponge_CSp, h)
       case ("channel6"); call channel6_initialize_sponges(G, GV, use_temperature, &
+                                                tv, PF, sponge_CSp, h)
+      case ("channel5"); call channel5_initialize_sponges(G, GV, use_temperature, &
+                                                tv, PF, sponge_CSp, h)
+      case ("channel4"); call channel4_initialize_sponges(G, GV, use_temperature, &
                                                 tv, PF, sponge_CSp, h)
       case ("DUMBBELL"); call dumbbell_initialize_sponges(G, GV, tv, &
                                                PF, useALE, sponge_CSp, ALE_sponge_CSp)

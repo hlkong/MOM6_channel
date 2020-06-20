@@ -212,25 +212,6 @@ end subroutine shoebox2_initialize_thickness
     cosbellh  = cos(PI/2.0*MIN(abs(xx)/L, 1.0))
   end function cosbellh
 
-  !< similar to cosbellh but takes a different shape of bell
-    real function cosbellhnew(x, L, dir)
-
-      real, intent(in) :: x       !< non-dimensional position
-      real, intent(in) :: L       !< non-dimensional width
-      real             :: PI, xx  !< 3.1415926... calculated as 4*atan(1)
-      real, intent(in) :: dir     !< direction flag; 1 for east/north; -1 for west/south
-      PI        = 4.0*atan(1.0)
-
-      !< if the grid falls on the opposite side of the bell, override x to be so big that x/L > 1
-      if (x*dir .lt. 0.0) then
-        xx = L+1
-      else
-        xx = x
-      endif
-
-     cosbellhnew  = 0.5*(1+cos(PI*MIN((xx)/L, 1.0)))
-    end function cosbellhnew
-
 
  !< make sure the depth within L is homogeneous
    real function homo(x, L)

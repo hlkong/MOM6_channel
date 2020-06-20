@@ -39,6 +39,7 @@ type, public :: channel4_surface_forcing_CS ; private
                              !! approximation, in kg m-3.
   real :: G_Earth            !< The gravitational acceleration in m s-2.
   real :: flux_const         !<  The restoring rate at the surface, in m s-1.
+  real :: windpeak_SO        !< wind stress peak in the Southern Ocean
   real, dimension(:,:), pointer :: &
     buoy_restore(:,:) => NULL() !< The pattern to restore buoyancy to.
   character(len=200) :: inputdir !< The directory where NetCDF input files are.
@@ -65,9 +66,8 @@ subroutine channel4_wind_forcing(sfc_state, forces, day, G, CS)
   integer :: isd, ied, jsd, jed, IsdB, IedB, JsdB, JedB
 
   real :: x, y
-  real :: PI = 4.0*atan(1.0), wp_SO, wp2, latext, lonext
+  real :: PI = 4.0*atan(1.0), wp2, latext, lonext
 
-  wp_SO = 0.2 ! westerly peak in SO;  53 S
   wp2 = -0.07871  ! easterly peak in Southern subtropics; 11.75S
   forces%taux = 0.0
   latext = G%len_lat
@@ -86,11 +86,11 @@ subroutine channel4_wind_forcing(sfc_state, forces, day, G, CS)
   !  accelerates the ocean to the (pseudo-)east.
   do j = js, je
       y=(G%geoLatT(is, j)-G%south_lat)/latext                                 ! non-dimensional latitudes
-      forces%taux(is, j) = wp_SO*cosbellh(y-12.0/latext, 12.0/latext, -1.0) & ! south of the ACC peak
+      forces%taux(is, j) = CS%windpeak_SO*cosbellh(y-12.0/latext, 12.0/latext, -1.0) & ! south of the ACC peak
                         + wp2*cosbell(y-54.0/latext, 22.0/latext)             ! profile in Southern subtropics
 
       if (y > 12.0/latext) then              ! north of the ACC peak
-        forces%taux(is, j) = forces%taux(is, j)+ wp_SO*cosbell(y-12.0/latext, 25.0/latext)
+        forces%taux(is, j) = forces%taux(is, j)+ CS%windpeak_SO*cosbell(y-12.0/latext, 25.0/latext)
       endif
 
       do i = is+1, ie
@@ -225,6 +225,9 @@ subroutine channel4_surface_forcing_init(Time, G, param_file, diag, CS)
                  "If true, the buoyancy fluxes drive the model back \n"//&
                  "toward some specified surface state with a rate \n"//&
                  "given by FLUXCONST.", default= .false.)
+  call get_param(param_file, mod, "WINDPEAK_SO", CS%windpeak_SO, &
+                 "Wind stress peak in the Southern Ocean. ", &                 
+                 units="N m-2", default= 0.2)
 
   if (CS%restorebuoy) then
     call get_param(param_file, mod, "FLUXCONST", CS%flux_const, &
